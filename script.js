@@ -177,26 +177,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ========================================
-// CONTACT FORM
-// ========================================
-const contactForm = document.getElementById('contactForm');
-
-contactForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    
-    // Here you would typically send the form data to a server
-    // For now, we'll just show an alert
-    alert(`Thank you, ${name}! Your message has been received.\n\nWe'll get back to you at ${email} soon.`);
-    
-    // Reset form
-    contactForm.reset();
-});
-
-// ========================================
 // NAVBAR SCROLL EFFECT
 // ========================================
 const navbar = document.querySelector('.navbar');
@@ -286,35 +266,51 @@ window.addEventListener('load', () => {
     console.log('%c🚀 Portfolio Loaded Successfully!', 'color: #4DA3FF; font-size: 20px; font-weight: bold;');
     console.log('%cDeveloped by Xavier Fernandes', 'color: #5CFFCE; font-size: 14px;');
 });
-// =========================
-// Formspree Contact Form
-// =========================
 
-document.getElementById("contactForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
 
-    const form = e.target;
+// ========================================
+// EMAIL JS CONTACT FORM INTEGRATION
+// ========================================
+
+// 1. Initialize EmailJS with your Public Key
+// REPLACE "YOUR_PUBLIC_KEY_HERE" with the actual key
+(function() {
+    // Example: emailjs.init("user_Xyz123abc");
+    emailjs.init("koH4uLGV12TeQzIXL"); 
+})();
+
+const contactForm = document.getElementById('contactForm');
+
+contactForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent standard form reload
+
+    // Grab elements for visual feedback
+    const btn = document.querySelector('.btn-submit');
     const formStatus = document.getElementById("formStatus");
-    const formData = new FormData(form);
+    const originalBtnText = btn.textContent;
 
-    try {
-        const response = await fetch(form.action, {
-            method: "POST",
-            body: formData,
-            headers: { "Accept": "application/json" }
-        });
+    // Change button text to indicate loading
+    btn.textContent = 'Sending...';
+    formStatus.textContent = '';
 
-        if (response.ok) {
+    // 2. Define Service and Template IDs
+    // REPLACE these with your actual IDs from EmailJS dashboard
+    const serviceID = 'service_2w6jt5v'; 
+    const templateID = 'template_o118xz9';
+
+    // Send the form
+    emailjs.sendForm(serviceID, templateID, this)
+        .then(() => {
+            // SUCCESS
+            btn.textContent = originalBtnText;
             formStatus.textContent = "✔ Message sent successfully!";
             formStatus.style.color = "var(--accent-secondary)";
-            form.reset();
-        } else {
-            formStatus.textContent = "❌ Failed to send message. Try again.";
+            contactForm.reset();
+        }, (err) => {
+            // ERROR
+            btn.textContent = originalBtnText;
+            formStatus.textContent = "❌ Failed to send message. Please try again.";
             formStatus.style.color = "red";
-        }
-
-    } catch (error) {
-        formStatus.textContent = "⚠ Error. Check your connection.";
-        formStatus.style.color = "red";
-    }
+            console.error('EmailJS Error:', err);
+        });
 });
