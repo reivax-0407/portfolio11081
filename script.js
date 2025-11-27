@@ -309,8 +309,9 @@ contactForm.addEventListener('submit', function(event) {
         }, (err) => {
             // ERROR
             btn.textContent = originalBtnText;
-            formStatus.textContent = "❌ Failed to send message. Please try again.";
+            formStatus.textContent = "❌ Failed to send message. Please try again ejs.";
             formStatus.style.color = "red";
             console.error('EmailJS Error:', err);
         });
 });
+
